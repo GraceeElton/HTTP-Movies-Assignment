@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import MovieCard from "./MovieCard";
 
 function Movie({ addToSavedList }) {
   const [movie, setMovie] = useState(null);
+  const { id } = useParams();
+  const { push } = useHistory();
   const params = useParams();
 
   const fetchMovie = (id) => {
@@ -12,6 +14,22 @@ function Movie({ addToSavedList }) {
       .get(`http://localhost:5000/api/movies/${id}`)
       .then((res) => setMovie(res.data))
       .catch((err) => console.log(err.response));
+  };
+
+  const deleteMovie = (event) => {
+    event.preventDefault();
+    axios
+      .delete(`http://localhost:5000/api/movies/${id}`)
+      .then((res) => {
+        // console.log({ res });
+        //res.data
+
+        //need to update state so you dont have to reload the page??? but how?
+        push("/");
+      })
+      .catch((error) => {
+        console.log({ error });
+      });
   };
 
   const saveMovie = () => {
@@ -33,6 +51,10 @@ function Movie({ addToSavedList }) {
       <div className="save-button" onClick={saveMovie}>
         Save
       </div>
+      <button onClick={() => push(`/update-item/${movie.id}`)}>
+        Edit Movie
+      </button>
+      <button onClick={deleteMovie}>Delete Movie</button>
     </div>
   );
 }
